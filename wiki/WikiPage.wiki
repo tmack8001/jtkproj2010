@@ -11,3 +11,7 @@ Add your content here.  Format your content with:
   * Text in *bold* or _italic_
   * Headings, paragraphs, and lists
   * Automatic links to other wiki pages
+
+= Important Video =
+
+<wiki:video url="http://www.youtube.com/watch?v=e4qU57xPh5E"/>
