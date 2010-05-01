@@ -27,6 +27,39 @@ public class JTKMain {
 		// turn stuff on.  this might not be necessary
 		sonar.setSonarPower(1);
 		motor.setMotorPower(1);
+		
+		while (true) {
+			float turnRate, speed;
+			
+			// read all the data
+			robot.readAll();
+			
+			// don't do anything unless there's data
+			
+			if (sonar.isDataReady()) {
+				PlayerSonarData sonarData = sonar.getData();
+				float[] ranges = sonarData.getRanges();
+				
+                double x = motor.getX();
+                double y = motor.getY();
+                double theta = motor.getYaw();
+                
+				if (ranges[0] + ranges[1] < ranges[6] + ranges[7])
+					turnRate = -20.0f * (float)Math.PI / 180.0f;
+				else
+					turnRate = 20.0f * (float)Math.PI / 180.0f;
+				
+				if (ranges[3] < 0.5f)
+					speed = 0.0f;
+				else
+					speed = 0.1f;
+				
+				// send the command
+				motor.setSpeed(speed, turnRate);
+			}
+		}
+				
+				
 	}
 
 }
