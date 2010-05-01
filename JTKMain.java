@@ -1,3 +1,6 @@
+import java.util.Random;
+
+
 
 public class JTKMain {
 
@@ -5,7 +8,11 @@ public class JTKMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		int j;
+		Random flushot = new Random();
+		flushot.setSeed(System.currentTimeMillis());
+		j = flushot.nextInt() % 100;
+		System.out.print(Math.abs(j));
 
 	}
 
