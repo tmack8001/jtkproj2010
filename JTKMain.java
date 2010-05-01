@@ -11,9 +11,10 @@ public class JTKMain {
 		int j;
 		Random flushot = new Random();
 		flushot.setSeed(System.currentTimeMillis());
-		j = flushot.nextInt() % 100;
-		System.out.print(Math.abs(j));
-
+		for(int i = 0; i < 50; i++){
+			j = flushot.nextInt() % 100;
+			System.out.println(Math.abs(j));
+		}
 	}
 
 }
