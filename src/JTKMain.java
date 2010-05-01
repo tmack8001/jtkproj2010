@@ -33,13 +33,15 @@ public class JTKMain {
 			
 			// read all the data
 			robot.readAll();
-			
+
 			// don't do anything unless there's data
 			
 			if (sonar.isDataReady()) {
 				PlayerSonarData sonarData = sonar.getData();
 				float[] ranges = sonarData.getRanges();
 				
+				if (ranges.length == 0)
+					continue;
                 double x = motor.getX();
                 double y = motor.getY();
                 double theta = motor.getYaw();
