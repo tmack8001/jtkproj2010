@@ -1,3 +1,11 @@
+import java.awt.geom.Point2D;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import javaclient2.PlayerClient;
 import javaclient2.Position2DInterface;
 import javaclient2.SonarInterface;
@@ -6,6 +14,10 @@ import javaclient2.structures.sonar.PlayerSonarData;
 
 public class JTKMain {
 
+	//points the robot needs to get to
+	static ArrayList<Point2D> points = new ArrayList<Point2D>(1);
+	
+	
 	/**
 	 * @param args
 	 */
@@ -16,7 +28,39 @@ public class JTKMain {
 		if (args.length == 2) {
 			server = args[0];
 			port = Integer.parseInt(args[1]);
+		}else if(args.length == 3){
+			server = args[0];
+			port = Integer.parseInt(args[1]);
+			String filename = args[2];
+			File inFile  = new File(filename);
+			
+			try {
+				BufferedReader reader = 
+					new BufferedReader(new FileReader(inFile));
+		        String line = null;
+		        while ( (line=reader.readLine()) != null) {
+		        	String[] temp = line.split(" ");
+		            Point2D curPoint = new Point2D.Double();
+		            curPoint.setLocation(Double.parseDouble(temp[0]), 
+		            		Double.parseDouble(temp[1]));
+		            points.add(curPoint);
+		        }
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("FileNotFound thrown");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("IOException thrown");
+			}	
 		}
+		
+		//test print of arraylist points
+		for(int x = 0; x < points.size(); x++){
+			System.out.println(points.get(x).toString());
+		}
+		
 		
 		PlayerClient robot = new PlayerClient(server, port);
 		SonarInterface sonar = robot.requestInterfaceSonar(0, 
