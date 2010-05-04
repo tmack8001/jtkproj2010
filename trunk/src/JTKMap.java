@@ -5,9 +5,11 @@ import java.io.FileInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.*;
 
-// from project.world: the size of a pixel in meters 0.02
-// from pioneer.inc: actual size [0.44 0.33] (assuming in meters)
+import java.awt.geom.Point2D;
 
+// from project.world: the size of a pixel in meters 0.02
+//                     size of the world: [131.2 41]
+// from pioneer.inc: actual size [0.44 0.33] (assuming in meters)
 
 public class JTKMap {
 
@@ -16,21 +18,7 @@ public class JTKMap {
 	/** cspace in bytes (for drawing) ... might delete this. */
 	public byte[] cspacebytes;
 	private boolean[] cspace;
-	private double radius = 5.;
-	private boolean[][] robot = { 
-	 {false,false,true, true, true, true, true, true, true, false,false },
-	 {false,true ,true, true, true, true, true, true, true, true ,false },
-	 {true ,true ,true, true, true, true, true, true, true, true ,true  },
-	 {true ,true ,true, true, true, true, true, true, true, true ,true  },
-	 {true ,true ,true, true, true, true, true, true, true, true ,true  },
-	 {true ,true ,true, true, true, true, true, true, true, true ,true  },
-	 {true ,true ,true, true, true, true, true, true, true, true ,true  },
-	 {true ,true ,true, true, true, true, true, true, true, true ,true  },
-	 {true ,true ,true, true, true, true, true, true, true, true ,true  },
-	 {false,true ,true, true, true, true, true, true, true, true ,false },
-	 {false,false,true, true, true, true, true, true, true, false,false },
-	};
-
+	private double radius = 5.0; // in pixels
 
 	public static void main(String args[]) {
 		new JTKMap();
@@ -62,9 +50,16 @@ public class JTKMap {
 		}
 		makecspace();
 		for(int i=0;i<1600*500;i++) {
-			cspacebytes[i]=(byte)(cspace[i]?255:0);
-			workspace[i]=(byte)(workspace[i]<0?255:0);
+			cspacebytes[i]=(byte)(cspace[i]?1:0);
+			workspace[i]=(byte)(workspace[i]<0?1:0);
 		}
+	}
+
+	/** get coordinate (x,y) in workspace map [meters]
+	 *  @return byte representation of workspace coordinate */
+	public boolean workspace(double x, double y) {
+		return workspace((int)Math.floor(1600.*x / 131.2 + (1600./2.)),
+		                 (int)Math.floor(500.*y / 41. + (500./2.)));
 	}
 
 	/** get coordinate (x,y) in workspace map 
@@ -73,10 +68,27 @@ public class JTKMap {
 		return workspace[1600*y+x] < 0;
 	}
 
+	/** get coordinate (x,y) in cspace map [meters]
+	 *  @return obstacle status */
+	public boolean cspace(double x, double y) {
+		return cspace((int)Math.floor(1600.*x / 131.2 + (1600./2.)),
+		              (int)Math.floor(500.*y / 41. + (500./2.)));
+	}
+
 	/** get coordinate (x,y) in cspace map 
 	 *  @return obstacle status */
 	public boolean cspace(int x, int y) {
 		return cspace[1600*y+x];
+	}
+
+	/** change point to pixel representation
+	 *  @return obstacle status */
+	public static Point2D point2pixels(Point2D p) {
+		Point2D q = new Point2D.Double(
+			 Math.floor(1600.*p.getX() / 131.2 + (1600./2.)),
+		         Math.floor(500.*p.getY()/ 41. + (500./2.)));
+		System.err.println(q);
+		return q;
 	}
 
 	private void makecspace() {
@@ -92,4 +104,5 @@ public class JTKMap {
 	    }
 	  }
 	}
+
 }
