@@ -42,13 +42,13 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 	}
 
 	public Dimension getPreferredSize() {
-		return new Dimension(800,250);
+		return new Dimension(800,500);
 	}
 
 	public void paintComponent(Graphics g) {
 		((Graphics2D)g).scale(
 			(double)getWidth()/1600.,
-			(double)getHeight()/500.);
+			(double)getHeight()/1000.);
 		g.drawImage(createImage(this),0,0,null);
 	}
 
@@ -70,8 +70,9 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 
 	public void startProduction(ImageConsumer ic) {
 		addConsumer(ic);
-		ic.setDimensions(1600,500);
+		ic.setDimensions(1600,1000);
 		ic.setPixels(0,0,1600,500,cm,map.workspace,0,1600);
+		ic.setPixels(0,500,1600,500,cm,map.cspacebytes,0,1600);
 		ic.imageComplete(ImageConsumer.SINGLEFRAMEDONE);
 	}
 
