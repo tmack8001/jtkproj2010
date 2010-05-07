@@ -49,11 +49,13 @@ public class Mapper {
 		sonar.setSonarPower(1);
 		motor.setMotorPower(1);
 		
+		JFrame frame = new JFrame();
 		GridMap gridMap = new GridMap(50, 50, 0.0625);
 		
-		 gridMap.setSize(new Dimension(800, 800));
-		 gridMap.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	     gridMap.setVisible(true);
+		frame.add(gridMap);
+		frame.setSize(new Dimension(800, 800));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
 		
 		while (true) {
 			float turnRate, speed;
@@ -125,7 +127,7 @@ public class Mapper {
 		}
 	}
 	
-	static void estimateObstacle( GridMap gridMap, Position2DInterface motor, float[] ranges ) {
+	public static void estimateObstacle( GridMap gridMap, Position2DInterface motor, float[] ranges ) {
 		double x = motor.getX();
         double y = motor.getY();
         double theta = motor.getYaw();
