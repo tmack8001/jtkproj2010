@@ -1,29 +1,20 @@
-// /CalcView.java - View component
-//    Presentation only.  No user actions.
-// Fred Swartz -- December 2004
+/*
+ * filename: JTKView.java
+ * Trevor Mack -- May 7th
+ */
 
 import homework5.GridMap;
 
 import java.awt.*;
-
-import javax.swing.*;
-
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import javax.swing.*;
 
 @SuppressWarnings("serial")
 class JTKView extends JFrame {
-    //... Constants
-    private static final String INITIAL_VALUE = "1";
-    
     //... Components
     private JMenuBar menu;
-    private JFrame gridMap;
+    private JPanel gridMap;
     private JButton sonarButton;
-    
-    private BufferedImage theMap;
-    private int imwidth, imheight;
-    private double scale;
     
     //======================================================= constructor
     /** Constructor */
