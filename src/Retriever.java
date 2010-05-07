@@ -24,7 +24,7 @@ import javaclient2.structures.sonar.PlayerSonarData;
  * @author Kevin Hockey - kdh7733
  *
  */
-public class JTKMain {
+public class Retriever {
 
 	//points the robot needs to get to
 	static ArrayList<Point2D> points = new ArrayList<Point2D>(1);
