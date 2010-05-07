@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
  * @author zjb 3/09
  */
 @SuppressWarnings("serial")
-public class GridMap extends JFrame {
+public class GridMap extends JPanel {
 
     private BufferedImage theMap;
     private int imwidth, imheight;
@@ -44,7 +44,7 @@ public class GridMap extends JFrame {
      * @param y Y location to update (global coords, in meters)
      * @param value New map value (0->255)
      */
-    void setVal(double x, double y, int value) {
+    public void setVal(double x, double y, int value) {
         /*if (value < 0 || value > 255)
             return;*/
         int imx = (int)(x/scale + imwidth/2);

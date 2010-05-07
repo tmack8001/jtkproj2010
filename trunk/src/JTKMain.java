@@ -1,3 +1,5 @@
+import homework5.GridMap;
+
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,11 +48,9 @@ public class JTKMain {
 		            points.add(curPoint);
 		        }
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.out.println("FileNotFound thrown");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.out.println("IOException thrown");
 			}	
@@ -61,12 +61,15 @@ public class JTKMain {
 			System.out.println(points.get(x).toString());
 		}
 		
-		
 		PlayerClient robot = new PlayerClient(server, port);
 		SonarInterface sonar = robot.requestInterfaceSonar(0, 
 				PlayerConstants.PLAYER_OPEN_MODE);
 		Position2DInterface motor = robot.requestInterfacePosition2D(0, 
 				PlayerConstants.PLAYER_OPEN_MODE);
+		
+		JTKView view = new JTKView(50, 50, 0.0625);
+		view.setModel(sonar, motor);
+		view.setVisible(true);
 		
 		// turn stuff on.  this might not be necessary
 		sonar.setSonarPower(1);
@@ -83,6 +86,7 @@ public class JTKMain {
 			if (sonar.isDataReady()) {
 				PlayerSonarData sonarData = sonar.getData();
 				float[] ranges = sonarData.getRanges();
+				view.repaint();
 				
 				if (ranges.length == 0)
 					continue;
@@ -104,7 +108,6 @@ public class JTKMain {
 				motor.setSpeed(speed, turnRate);
 			}
 		}
-				
 				
 	}
 
