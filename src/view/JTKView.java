@@ -1,3 +1,4 @@
+package view;
 /*
  * filename: JTKView.java
  * Trevor Mack -- May 7th
@@ -27,17 +28,17 @@ class JTKView extends JFrame {
     //data to use to update
     SonarInterface sonarData; //sonar model
     Position2DInterface robotData; //robot model
-
+    
     //======================================================= constructor
     /** Constructor */
-    public JTKView(int width, int height, double mpp) {
+    JTKView(int width, int height, double mpp) {
         //... Set up the logic
     	
         //... Initialize components
     	menu = new JMenuBar();
     	sonarButton = new JButton("Sonar Array");
     	exitButton = new JButton("Exit Program");
-    	
+    
     	sonarMap = new JFrame();
     	sonarMap.setVisible(false);
     	
