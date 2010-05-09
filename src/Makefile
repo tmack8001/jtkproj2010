@@ -1,7 +1,7 @@
 
 OPTS=-g
 
-CLASSPATH=../javaclient.jar
+CLASSPATH=.:../javaclient.jar
 
 build:
 	javac $(OPTS) -classpath $(CLASSPATH) *.java
