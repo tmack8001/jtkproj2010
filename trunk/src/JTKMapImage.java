@@ -11,13 +11,18 @@ import java.io.ByteArrayInputStream;
 import java.io.*;
 
 import java.util.List;
+import java.util.Collection;
 import java.util.LinkedList;
+
+import java.util.Random;
 
 public class JTKMapImage extends JPanel implements ImageProducer {
 
 	private JTKMap map;
+	private Image img = null;
 	private List<ImageConsumer> iclist;
 	private List<Point2D> points = null;
+	private Collection<Point2D> particles = null;
 	private ColorModel cm;
 
 	public static void main(String args[]) throws Exception {
@@ -29,10 +34,24 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 		f.pack();
 		f.setVisible(true);
 
-		List<Point2D> p = new LinkedList<Point2D>();
-		p.add(new Point2D.Double(-30.0,-9.0));
-		p.add(new Point2D.Double(-30.0,12.7));
-		jtk.setPoints(p);
+		List<Point2D> p1 = new LinkedList<Point2D>();
+		p1.add(new Point2D.Double(-30.0,-9.0));
+		p1.add(new Point2D.Double(-30.0,12.7));
+		jtk.setPoints(p1);
+
+		//   size of the world: [131.2 41]
+		List<Point2D> p2 = new LinkedList<Point2D>();
+		Random r = new Random();
+		for(int i=0;i<500;i++)
+			p2.add(new Point2D.Double(
+				(r.nextDouble()-.5)*(131.2),
+				(r.nextDouble()-.5)*(41.)));
+		jtk.setParticles(p2);
+	}
+
+	public void setParticles(Collection<Point2D> particles) {
+		this.particles = particles;
+		repaint();
 	}
 
 	public void setPoints(List<Point2D> points) {
@@ -48,8 +67,8 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 		byte[] g = new byte[256];
 		byte[] b = new byte[256];
 		
-		r[0]=g[0]=b[0];
-		r[1]=g[1]=b[1]=(byte)255;
+		r[0]=g[0]=b[0]=(byte)255;
+		r[1]=g[1]=b[1]=0;
 		
 		r[2]=(byte)255;
 		g[2]=b[2]=0;
@@ -60,19 +79,31 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 	}
 
 	public Dimension getPreferredSize() {
-		return new Dimension(800,500);
+		return new Dimension(800,250);
 	}
 
 	public void paintComponent(Graphics g) {
-		((Graphics2D)g).scale(
-			(double)getWidth()/1600.,
-			(double)getHeight()/1000.);
-		g.drawImage(createImage(this),0,0,null);
+		if(img==null) img = createImage(this);
+		Graphics2D g2d = (Graphics2D)g;
+		double scaleW = (double)getWidth() / (double)img.getWidth(this);
+		double scaleH = (double)getHeight() / (double)img.getHeight(this);
+
+		g2d.scale(scaleW,scaleH);
+		g.drawImage(img,0,0,null);
+
+		g2d.scale(1./scaleW,1./scaleH);
+
 		g.setColor(Color.GREEN);
 		if(points != null) for(Point2D p : points) {
-			g.drawRect((int)JTKMap.point2pixels(p).getX(),
-			           (int)JTKMap.point2pixels(p).getY(),
-				   5,5);
+			g.fillRect((int)(scaleW*JTKMap.point2pixels(p).getX()),
+			           (int)(scaleH*JTKMap.point2pixels(p).getY()),
+				   3,3);
+		}
+		g.setColor(Color.RED);
+		if(particles != null) for(Point2D p : particles) {
+			g.fillRect((int)(scaleW*JTKMap.point2pixels(p).getX()),
+			           (int)(scaleH*JTKMap.point2pixels(p).getY()),
+				   1,1);
 		}
 			
 	}
@@ -95,15 +126,12 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 
 	public void startProduction(ImageConsumer ic) {
 		addConsumer(ic);
-		ic.setDimensions(1600,1000);
+
+		ic.setDimensions(1600,500);
 		ic.setPixels(0,0,1600,500,cm,map.workspace,0,1600);
-		ic.setPixels(0,500,1600,500,cm,map.cspacebytes,0,1600);
-		//byte[] b = new byte[100];
 
-		//for(int i=0;i<100;i++)
-		//	b[i] = (byte)2;
-
-		//ic.setPixels(10,10,10,10,cm,b,0,10);
+		// c-space display:
+		//ic.setPixels(0,500,1600,500,cm,map.cspacebytes,0,1600);
 
 		ic.imageComplete(ImageConsumer.SINGLEFRAMEDONE);
 	}
