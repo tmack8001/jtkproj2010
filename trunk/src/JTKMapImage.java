@@ -22,7 +22,7 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 	private Image img = null;
 	private List<ImageConsumer> iclist;
 	private List<Point2D> points = null;
-	private Collection<Point2D> particles = null;
+	private JTKLocal.Sample[] particles = null;
 	private ColorModel cm;
 
 	public static void main(String args[]) throws Exception {
@@ -40,16 +40,21 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 		jtk.setPoints(p1);
 
 		//   size of the world: [131.2 41]
-		List<Point2D> p2 = new LinkedList<Point2D>();
-		Random r = new Random();
-		for(int i=0;i<500;i++)
-			p2.add(new Point2D.Double(
-				(r.nextDouble()-.5)*(131.2),
-				(r.nextDouble()-.5)*(41.)));
-		jtk.setParticles(p2);
+		//List<Point2D> p2 = new LinkedList<Point2D>();
+		//Random r = new Random();
+		//for(int i=0;i<500;i++)
+		//	p2.add(new Point2D.Double(
+		//		(r.nextDouble()-.5)*(131.2),
+		//		(r.nextDouble()-.5)*(41.)));
+
+		SonarModel sonar = new SonarModel(10);
+
+		JTKLocal local = new JTKLocal(sonar,500,jtk.map);
+
+		jtk.setParticles(local.S);
 	}
 
-	public void setParticles(Collection<Point2D> particles) {
+	public void setParticles(JTKLocal.Sample[] particles) {
 		this.particles = particles;
 		repaint();
 	}
@@ -100,9 +105,10 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 				   3,3);
 		}
 		g.setColor(Color.RED);
-		if(particles != null) for(Point2D p : particles) {
-			g.fillRect((int)(scaleW*JTKMap.point2pixels(p).getX()),
-			           (int)(scaleH*JTKMap.point2pixels(p).getY()),
+		if(particles != null) for(JTKLocal.Sample s : particles) {
+			Point2D p = JTKMap.point2pixels(new Point2D.Double(s.X,s.Y));
+			g.fillRect((int)(scaleW*p.getX()),
+			           (int)(scaleH*p.getY()),
 				   1,1);
 		}
 			
