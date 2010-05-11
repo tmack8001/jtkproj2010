@@ -33,7 +33,6 @@ public class JTKMap {
 			DataInputStream in = new DataInputStream(
 				new FileInputStream(f));
 			for(int i=0;i<1600*500;i++) {
-				//workspace = (in.readByte < 0);
 				workspace[i] = in.readByte();
 				cspace[i] = false;
 			}
@@ -86,7 +85,7 @@ public class JTKMap {
 	public static Point2D point2pixels(Point2D p) {
 		Point2D q = new Point2D.Double(
 			 Math.floor(1600.*p.getX() / 131.2 + (1600./2.)),
-		         Math.floor(500.*p.getY()/ 41. + (500./2.)));
+		         500 - Math.floor(500.*p.getY()/ 41. + (500./2.)));
 		System.err.println(q);
 		return q;
 	}
