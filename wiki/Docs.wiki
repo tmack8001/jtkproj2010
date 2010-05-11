@@ -2,3 +2,4 @@
 
   * [JTKMap] 
   * [GUI]
+  * [JTKLocal]
