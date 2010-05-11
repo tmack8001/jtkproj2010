@@ -7,7 +7,7 @@
 
   * Make sure you have your [JTKMap] already!
   * use constructor: `new JTKMapImage(JTKMap)`
-  * Pass in goal points: `setPoints(List<Point2D>`
-  * Points must be in _METERS_!
-  * *TODO:* display path.
-  * *TODO:* display particles, location.
+  * Pass in goal points: `setPoints(List<Point2D>)`
+  * Pass in particles: `setParticles(List<Point2D>)`
+  * Pass in current path: `setPath(List<Point2D>)`
+  * ALL Points must be in _METERS_!
