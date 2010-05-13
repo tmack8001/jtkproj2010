@@ -1,8 +1,9 @@
-package view;
 /*
  * filename: JTKView.java
  * Trevor Mack -- May 7th
  */
+
+package view;
 
 import homework5.GridMap;
 import homework5.Mapper;
@@ -16,11 +17,14 @@ import javaclient2.SonarInterface;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
+public
 class JTKView extends JFrame {
     //... Components
     private JMenuBar menu;
     private GridMap gridMap;
-    private JFrame sonarMap; //this shows the current sonar reading (from James)
+    
+    private JFrame sonarFrame;
+    private SonarView sonarView; //this shows the current sonar reading (from James)
     
     private JButton sonarButton;
     private JButton exitButton;
@@ -31,7 +35,7 @@ class JTKView extends JFrame {
     
     //======================================================= constructor
     /** Constructor */
-    JTKView(int width, int height, double mpp) {
+    public JTKView(int width, int height, double mpp) {
         //... Set up the logic
     	
         //... Initialize components
@@ -39,8 +43,11 @@ class JTKView extends JFrame {
     	sonarButton = new JButton("Sonar Array");
     	exitButton = new JButton("Exit Program");
     
-    	sonarMap = new JFrame();
-    	sonarMap.setVisible(false);
+    	sonarFrame = new JFrame();
+    	sonarView = new SonarView();
+    	sonarFrame.setSize(200, 400);
+    	sonarFrame.add(sonarView);
+    	sonarFrame.setVisible(false);
     	
     	gridMap = new GridMap(width, height, mpp);
     	
@@ -56,7 +63,7 @@ class JTKView extends JFrame {
         sonarButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				sonarMap.setVisible(true);
+				sonarFrame.setVisible(true);
 			}
 		});
         
@@ -72,6 +79,7 @@ class JTKView extends JFrame {
         //... finalize layout
         this.setContentPane(content);
         this.pack();
+        this.setLocationRelativeTo(null);
         
         this.setTitle("SLAM - JTK");
         // The window closing event should probably be passed to the 
@@ -79,21 +87,21 @@ class JTKView extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
-    void setModel(SonarInterface sonar, Position2DInterface motor) {
+    public void setModel(SonarInterface sonar, Position2DInterface motor) {
     	//update SonarPanel if visible
     	//update Map with sonar data
     	sonarData = sonar;
     	robotData = motor;
+    	
+    	sonarView.updateSonars(sonarData.getData().getRanges());
+    	repaint();
     }
     
     public void repaint() {
     	gridMap.setVal(robotData.getX(), robotData.getY(), -1);
     	Mapper.estimateObstacle(gridMap, robotData, sonarData.getData().getRanges());
-    	this.gridMap.repaint();
-    	
-    	if(sonarMap.isVisible()) {
-    		sonarMap.repaint();
-    	}
+    	gridMap.repaint();
+    	sonarFrame.repaint();
     }
     
     void showError(String errMessage) {

@@ -1,4 +1,4 @@
-
+package view;
 import javax.swing.JPanel;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
@@ -9,7 +9,7 @@ import java.awt.RenderingHints;
 
 
 public class SonarView extends JPanel {
-	private double sp[] = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
+	private float sp[] = { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f };
 	private int width = 400;
 	int pioneer_x[] = { 23,15,-15,-23,-23,-15,15,23 };
 	int pioneer_y[] = { 05,15,15,05,-05,-15,-15,-05 };
@@ -30,9 +30,10 @@ public class SonarView extends JPanel {
 		super();
 	}
 
-	public void updateSonars(double[] sonars) {
+	public void updateSonars(float[] sonars) {
 		sp = sonars;
 		repaint();
+		this.requestFocus();
 	}
 
 	public void paintComponent(Graphics g) {

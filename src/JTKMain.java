@@ -1,4 +1,8 @@
-import homework5.GridMap;
+/**
+ * filename: Retriever.java
+ */
+
+import view.JTKView;
 
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
@@ -14,6 +18,14 @@ import javaclient2.SonarInterface;
 import javaclient2.structures.PlayerConstants;
 import javaclient2.structures.sonar.PlayerSonarData;
 
+/**
+ * This file is the main program that will be run when the project is finally turned in.
+ * 
+ * @author Trevor Mack - tmm9274
+ * @author James Loomis - jtl2011
+ * @author Kevin Hockey - kdh7733
+ *
+ */
 public class JTKMain {
 
 	//points the robot needs to get to
