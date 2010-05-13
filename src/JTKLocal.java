@@ -36,7 +36,6 @@ public class JTKLocal {
 		{0.130,0.115,0.080,0.025,-0.025,-0.080,-0.115,-0.130};
 	private double sonar_h[] = 
 		{1.571,0.873,0.523,0.175,-.175,-.523,-.873,-1.571};
-	
 
 	public JTKLocal(SonarModel sonar,int N,JTKMap map) {
 		this.map = map;
@@ -67,11 +66,15 @@ public class JTKLocal {
 		time = (double)(now - lasttime) / 1000.; 
 		lasttime = now;
 
+		System.out.println(time + " " + new java.util.Date());
+
 		double totalW = 0.;
+		double conf = 0.;
 		for(int i=0;i<N;i++) {
 			T[i] = S[i].motion(speed,turnrate);
 			W[i] = T[i].probability(sp);
 			totalW += W[i];
+			if(W[i] > conf) conf = W[i];
 		}
 
 		double CDF[] = new double[N];
@@ -80,11 +83,15 @@ public class JTKLocal {
 			CDF[i] = W[i] / totalW + pastCDF;
 		}
 
-		System.out.println("time: " + time + " CDF[N-1]: " + CDF[N-1]
+		System.out.println("time: " + time + " conf: " + conf
 			+ " totalW = " + totalW);
 		
 		// sampling
 		for(int i=0;i<N;i++) {
+			//if(i < 100 && totalW < 20.) {
+			//	S[i] = new Sample();
+			//	continue;
+			//}
 			// random U(0,1)
 			double p = rand.nextDouble();
 
@@ -136,9 +143,9 @@ public class JTKLocal {
 		}
 
 		public Sample(double X,double Y,double H) {
-			this.X = X + rand.nextGaussian() * .1;
-			this.Y = Y + rand.nextGaussian() * .1;
-			this.H = H + rand.nextGaussian() * .1;
+			this.X = X + rand.nextGaussian() * .05;
+			this.Y = Y + rand.nextGaussian() * .05;
+			this.H = H + rand.nextGaussian() * .01;
 		}
 
 		public Sample motion(double speed,double turnrate) {
@@ -180,6 +187,8 @@ public class JTKLocal {
 
 		public double probability(double sp[]) {
 			double prob = 1.;
+			if(map.cspace(X,Y))
+				prob = .1;
 
 			for(int i=0;i<8;i++) { // for each sonar
 			  double x = X + sonar_x[i];
@@ -211,7 +220,7 @@ public class JTKLocal {
 	}
 
 	public static void main(String args[]) throws Exception {
-		int port = 6665;
+		int port = 6668;
 		String server = "192.168.1.107";
 		
 		JFrame f = new JFrame("JTKLocal - localization");
@@ -260,18 +269,15 @@ public class JTKLocal {
 				for(int i=0;i<8;i++) 
 					sp[i] = ranges[i];
                 
-				if (ranges[0] + ranges[1] < ranges[6] + ranges[7])
-					turnRate = -20.0f * (float)Math.PI / 180.0f;
-				else
-					turnRate = 20.0f * (float)Math.PI / 180.0f;
-				
-				if (ranges[3] < 0.5f)
-					speed = 0.0f;
-				else
-					speed = 0.1f;
-
-				//speed = 0f;
-				//turnRate = 0f;
+				double left = sp[0] + sp[1] + sp[2] + sp[3];
+				double right = sp[4] + sp[5] + sp[6] + sp[7];
+				if(sp[3] + sp[4] > 2f) {
+					turnRate = (float)(Math.sqrt(left) - Math.sqrt(right));
+					speed = .5f;
+				} else {
+					speed = 0f;
+					turnRate = (float)Math.PI/12f;
+				}
 				
 				// send the command
 				motor.setSpeed(speed, turnRate);

@@ -49,7 +49,7 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 
 		SonarModel sonar = new SonarModel(10);
 
-		JTKLocal local = new JTKLocal(sonar,500,jtk.map);
+		JTKLocal local = new JTKLocal(sonar,5000,jtk.map);
 
 		jtk.setParticles(local.S);
 
@@ -106,10 +106,12 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 
 		g.setColor(Color.GREEN);
 		if(points != null) for(Point2D p : points) {
-			g.fillRect((int)(scaleW*JTKMap.point2pixels(p).getX()),
-			           (int)(scaleH*JTKMap.point2pixels(p).getY()),
-				   3,3);
+		   g.fillRect(
+		      (int)(scaleW*JTKMap.point2pixels(p).getX())-2,
+		      (int)(scaleH*JTKMap.point2pixels(p).getY())-2,
+		      5,5);
 		}
+
 		g.setColor(Color.RED);
 		if(particles != null) for(JTKLocal.Sample s : particles) {
 			Point2D p = JTKMap.point2pixels(new Point2D.Double(s.X,s.Y));
