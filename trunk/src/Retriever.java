@@ -10,6 +10,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import view.JTKView;
+
 import javaclient2.PlayerClient;
 import javaclient2.Position2DInterface;
 import javaclient2.SonarInterface;
@@ -78,14 +80,12 @@ public class Retriever {
 				PlayerConstants.PLAYER_OPEN_MODE);
 		
 		JTKView view = new JTKView(50, 50, 0.0625);
-		view.setModel(sonar, motor);
-		view.setVisible(true);
 		
 		// turn stuff on.  this might not be necessary
 		sonar.setSonarPower(1);
 		motor.setMotorPower(1);
 		
-		while (true) {
+		while(true) {
 			float turnRate, speed;
 			
 			// read all the data
@@ -94,6 +94,9 @@ public class Retriever {
 			// don't do anything unless there's data
 			
 			if (sonar.isDataReady()) {
+				view.setModel(sonar, motor);
+				view.setVisible(true);
+				
 				PlayerSonarData sonarData = sonar.getData();
 				float[] ranges = sonarData.getRanges();
 				view.repaint();
