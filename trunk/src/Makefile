@@ -13,9 +13,8 @@ ci: build doc
 doc:
 	javadoc -d ../javadocs -classpath $(CLASSPATH) -private *.java
 
-test:
-	java -classpath $(CLASSPATH) JTKLocal
-
 clean:
 	$(RM) *.class
 
+test: build
+	java -classpath $(CLASSPATH) JTKLocal
