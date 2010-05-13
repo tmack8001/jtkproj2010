@@ -52,6 +52,12 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 		JTKLocal local = new JTKLocal(sonar,500,jtk.map);
 
 		jtk.setParticles(local.S);
+
+		for(int i=0;i<360;i+=10) {
+			double theta = (double)i * Math.PI/180.;
+			double dist = jtk.map.raycast(-30.,-9.,theta);
+			System.out.println(i + "\t" + dist);
+		}
 	}
 
 	public void setParticles(JTKLocal.Sample[] particles) {
