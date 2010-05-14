@@ -17,4 +17,4 @@ clean:
 	$(RM) *.class
 
 test: build
-	java -classpath $(CLASSPATH) JTKLocal
+	java -classpath $(CLASSPATH) Retriever

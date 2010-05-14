@@ -30,6 +30,12 @@ public class JTKLocal implements Runnable{
 
 	Sample[] S;
 
+	private double speed;
+	private double turnrate;
+	private double[] sp;
+
+	private boolean isready = false;
+
 	// sonar info yanked from pioneer.inc
 	private double sonar_x[] =
 		{0.075,0.115,0.150,0.170,0.170,0.150,0.115,0.075};
@@ -54,13 +60,18 @@ public class JTKLocal implements Runnable{
 		
 	}
 
+	public void update(double speed,double turnrate,double sp[]) {
+		this.speed = speed;
+		this.turnrate = turnrate;
+		this.sp = sp;
+		isready = true;
+		notify();	
+	}
+
 	// function implemented out of:
 	// Artificial Intelligence, 3rd Ed, 
 	// by Russel & Norvig, page 982.
-	public Sample[] update(
-			double speed,
-			double turnrate,
-			double[] sp) {
+	public void _update() {
 
 		Sample T[] = new Sample[N];
 		double W[] = new double[N];
@@ -110,7 +121,6 @@ public class JTKLocal implements Runnable{
 			S[i] = T[index];
 		}
 
-		return S;
 	}
 
 	public int binarysearch(int start,int end,double array[],double target) {
@@ -291,8 +301,12 @@ public class JTKLocal implements Runnable{
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		
+		while(true) {
+			if(isready)
+				_update();
+			isready = false;
+			wait();
+		}
 	}
 
 }
