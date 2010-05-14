@@ -39,10 +39,14 @@ public class JTKLocal implements Runnable{
 
 	private Lock lock;
 	private boolean isready = false;
+	private boolean firsttime = true;
 
 	private double lastx;
 	private double lasty;
 	private double lasth;
+	private double curx;
+	private double cury;
+	private double curh;
 
 	// sonar info yanked from pioneer.inc
 	private double sonar_x[] =
@@ -60,6 +64,10 @@ public class JTKLocal implements Runnable{
 		this.N = N;
 		rand = new Random();
 		S = new Sample[N];
+		
+		lastx = 0;
+		lasty = 0;
+		lasth = 0;
 
 		//for(int i=0;i<N;i++)
 		//	S[i] = new Sample(); //random
@@ -97,10 +105,21 @@ public class JTKLocal implements Runnable{
 		
 	}
 
-	public synchronized void update(double speed,double turnrate,double sp[]) {
+	public synchronized void update(double x, double y, double h, double sp[]) {
 		if(!isready && lock.tryLock()) {
-			this.speed = speed;
-			this.turnrate = turnrate;
+			//this.speed = speed;
+			//this.turnrate = turnrate;
+			
+			this.curx = curx;
+			this.cury = cury;
+			this.curh = curh;
+			if(firsttime) {
+				this.lastx = curx;
+				this.lasty = cury;
+				this.lasth = curh;
+				firsttime = false;
+			}
+
 			this.sp = sp;
 			isready = true;
 			System.out.println("updated");
@@ -125,7 +144,7 @@ public class JTKLocal implements Runnable{
 		double totalW = 0.;
 		double conf = 0.;
 		for(int i=0;i<N;i++) {
-			T[i] = S[i].motion(speed,turnrate);
+			T[i] = S[i].motion(curx-lastx,cury-lasty,curh-lasth);
 			W[i] = T[i].probability(sp);
 			//if(T[i].obstacle()) {
 			////if(W[i] < .01) {
@@ -212,11 +231,11 @@ public class JTKLocal implements Runnable{
 			this(X,Y,(double)H * Math.PI / 180.);
 		}
 
-		public Sample motion(double speed,double turnrate) {
-			double dist = speed * time;
-			double theta = turnrate * time;
-			return new Sample(X + dist*Math.cos(H+theta), 
-				Y + dist*Math.sin(H+theta), H+theta);
+		public Sample motion(double dx,double dy,double dh) {
+			//double dist = speed * time;
+			//double theta = turnrate * time;
+			return new Sample(X + dx, 
+				Y + dy, H+dh);
 		}
 
 		public boolean obstacle() {
@@ -283,74 +302,6 @@ public class JTKLocal implements Runnable{
 			return prob;
 		}
 
-	}
-
-	public static void main(String args[]) throws Exception {
-		int port = 6668;
-		String server = "192.168.1.107";
-		
-		JFrame f = new JFrame("JTKLocal - localization");
-		JTKMap map = new JTKMap();
-		JTKMapImage jtk = new JTKMapImage(map);
-		f.add(jtk);
-		f.pack();
-		f.setVisible(true);
-
-		List<Point2D> p1 = new LinkedList<Point2D>();
-		p1.add(new Point2D.Double(-30.0,-9.0));
-		p1.add(new Point2D.Double(-30.0,12.7));
-		jtk.setPoints(p1);
-
-		SonarModel sonarmodel = new SonarModel(10);
-		JTKLocal local = new JTKLocal(sonarmodel,5000,map);
-		jtk.setParticles(local.S);
-
-		PlayerClient robot = new PlayerClient(server, port);
-		SonarInterface sonar = robot.requestInterfaceSonar(0, 
-				PlayerConstants.PLAYER_OPEN_MODE);
-		Position2DInterface motor = robot.requestInterfacePosition2D(0, 
-				PlayerConstants.PLAYER_OPEN_MODE);
-		
-		// turn stuff on.  this might not be necessary
-		sonar.setSonarPower(1);
-		motor.setMotorPower(1);
-		
-		double sp[] = new double[8];
-		while (true) {
-			float turnRate, speed;
-			
-			// read all the data
-			robot.readAll();
-
-			// don't do anything unless there's data
-			
-			if (sonar.isDataReady()) {
-				PlayerSonarData sonarData = sonar.getData();
-				float[] ranges = sonarData.getRanges();
-				jtk.repaint();
-				
-				if (ranges.length == 0)
-					continue;
-
-				for(int i=0;i<8;i++) 
-					sp[i] = ranges[i];
-                
-				double left = sp[0] + sp[1] + sp[2] + sp[3];
-				double right = sp[4] + sp[5] + sp[6] + sp[7];
-
-				if(sp[3] + sp[4] > 2f) {
-					turnRate = (float)(Math.sqrt(left) - Math.sqrt(right));
-					speed = .5f;
-				} else {
-					speed = 0f;
-					turnRate = (float)Math.PI/12f;
-				}
-				
-				// send the command
-				motor.setSpeed(speed, turnRate);
-				local.update((double)speed,(double)turnRate,sp);
-			}
-		}
 	}
 
 	@Override

@@ -199,7 +199,8 @@ public class Retriever {
 				// send the command
 				motor.setSpeed(speed, turnRate);
 				//update particles with given directions
-				local.update((double)speed,(double)turnRate,sp);
+				local.update((double)motor.getX(),(double)motor.getY(),(double)motor.getYaw() * Math.PI/180.,sp);
+				System.out.println("X: " + motor.getX() + " Y: " + motor.getY() + " THETA: " + motor.getYaw());
 			}
 		}					
 	}
