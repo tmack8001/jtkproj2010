@@ -75,6 +75,10 @@ public class Graph {
 		return count;
 	}
 	
+	public List<Point2D> getVertices() {
+		return Arrays.asList(adjacencyMap.keySet().toArray(new Point2D[0]));
+	}
+	
 	/**
 	* Adds a specified Point2D as a vertex
 	*
@@ -131,24 +135,29 @@ public class Graph {
 	 * @param k		the number of closest vertices to find
 	 * @return 		the closest unconnected vertex to obj
 	 */
-	public List<Point2D> closestVertex (Point2D v, int k) {
-		List<Point2D> closest = new LinkedList<Point2D>();
-		
-		//initialize min/max distances
-		double minDist = Double.MAX_VALUE;
-		double maxDist = Double.MAX_VALUE;
+	public List<Point2D> closestVertices (Point2D v, int k) {
+		Hashtable<Double, Point2D> closest = new Hashtable<Double, Point2D>();
 		
 		//iterate through list of points
 		Iterator<Point2D> iter = adjacencyMap.keySet().iterator();
 		while(iter.hasNext()) {
 			Point2D temp = iter.next();
-			if( !isEdge(v, temp) && v.distance(temp) < minDist ) {
-				minDist = v.distance(temp);
-				closest.add(0, temp);
-			}else if(v.distance(temp) > minDist && v.distance(temp) < maxDist) {
-			}
+			if(temp != v && !isEdge(v, temp))
+				closest.put(new Double(v.distance(temp)), temp);
 		}
-		return closest;
+		
+		List<Point2D> closestPoints = new ArrayList<Point2D>();
+		List<Double> keyList = Arrays.asList(closest.keySet().toArray(new Double[0]));
+		Collections.sort(keyList);
+		Iterator<Double> iter2 = keyList.iterator();
+		while(iter2.hasNext()) {
+			if(closestPoints.size() == k)
+				break;
+			closestPoints.add(closest.get(iter2.next()));
+			//Double key = iter2.next();
+			//System.out.println("key = " + key.toString() + " -> value = " + closest.get(key));
+		}
+		return closestPoints;
 	}
 	
 }

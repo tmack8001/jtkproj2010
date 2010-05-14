@@ -22,6 +22,7 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 	private Image img = null;
 	private List<ImageConsumer> iclist;
 	private List<Point2D> points = null;
+	private Graph prm = null;
 	private JTKLocal.Sample[] particles = null;
 	private ColorModel cm;
 
@@ -69,6 +70,11 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 		this.points = points;
 		repaint();
 	}
+	
+	public void setPRM(Graph graph) {
+		prm = graph;
+		repaint();
+	}
 
 	public JTKMapImage(JTKMap map) {
 		iclist = new LinkedList<ImageConsumer>();
@@ -112,6 +118,19 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 		      5,5);
 		}
 
+		g.setColor(Color.BLUE);
+		if(prm != null) {
+			for(Point2D p1 : prm.getVertices()) {
+				for(Point2D p2 : prm.getNeighbors(p1) )
+			   g.drawLine(
+			      (int)(scaleW*JTKMap.point2pixels(p1).getX())-2,
+			      (int)(scaleH*JTKMap.point2pixels(p1).getY())-2,
+			      (int)(scaleW*JTKMap.point2pixels(p2).getX())-2,
+			      (int)(scaleH*JTKMap.point2pixels(p2).getY())-2
+			      );
+			}
+		}
+		
 		g.setColor(Color.RED);
 		if(particles != null) for(JTKLocal.Sample s : particles) {
 			Point2D p = JTKMap.point2pixels(new Point2D.Double(s.X,s.Y));

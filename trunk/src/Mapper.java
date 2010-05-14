@@ -92,7 +92,7 @@ public class Mapper {
                 */
                 double x = motor.getX();
                 double y = motor.getY();
-                double theta = motor.getYaw();
+               // double theta = motor.getYaw();
                 
                 gridMap.setVal(x, y, -1);
                 estimateObstacle(gridMap, motor, ranges);

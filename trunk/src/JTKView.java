@@ -21,7 +21,7 @@ class JTKView extends JFrame {
     
     private JFrame sonarFrame;
     private SonarView sonarView; //this shows the current sonar reading (from James)
-    private JTKMapImage particleImage; //this shows the current state of the particles for localization
+    //private JTKMapImage particleImage; //this shows the current state of the particles for localization
     
     
     private JButton sonarButton;
