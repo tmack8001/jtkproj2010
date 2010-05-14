@@ -178,7 +178,10 @@ public class JTKPath extends Thread {
 			parentPoint = pp;
 			pointLocation = p1;
 			hCost = p1.distance(goal);
-			gCost = pp.fCost();
+			gCost = 0;
+			if(pp != null)
+				gCost = pp.fCost();
+			
 		}
 		
 		public double fCost() {
