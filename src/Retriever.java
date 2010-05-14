@@ -50,8 +50,6 @@ public class Retriever {
     private static JButton sonarButton;
     private static JButton exitButton;
 
-	private static Goto follower = null;
-	
 	/**
 	 * @param 	args[0] host
 	 * 			args[1] port
@@ -61,7 +59,11 @@ public class Retriever {
 		int port = 6665;
 		String server = "localhost";
 		List<Point2D> points = new LinkedList<Point2D>();
-		
+		int currentpoint = 0;
+		JTKPath path;
+		Goto follower = null;
+
+
 		if (args.length == 2) {
 			server = args[0];
 			port = Integer.parseInt(args[1]);
@@ -94,6 +96,7 @@ public class Retriever {
 		//create GUI
 		f = new JFrame("JTKProj2010 - Retriever");
 		JTKMap map = new JTKMap();
+		path = new JTKPath(map);
 		JTKMapImage jtk = new JTKMapImage(map);
 		
 		//... Initialize menu
@@ -163,6 +166,7 @@ public class Retriever {
 		double sp[] = new double[8];
 		while (true) {
 			float turnRate, speed;
+			turnRate = speed = 0f;
 			
 			// read all the data
 			robot.readAll();
@@ -189,6 +193,7 @@ public class Retriever {
                 
 				//execute a random walk if not localized
 				if(!local.localized) {
+					follower = null;
 					double left = sp[0] + sp[1] + sp[2] + sp[3];
 					double right = sp[4] + sp[5] + sp[6] + sp[7];
 					if(sp[3] + sp[4] > 2f) {
@@ -199,11 +204,28 @@ public class Retriever {
 						speed = 0f;
 						turnRate = (float)Math.PI/12f;
 					}
+				} else if(currentpoint == points.size()) {
+					System.out.println("I'M DONE!");
+					speed = 0f;
+					turnRate = 1f; 
 				} else {
-					if(follower == null) {
-						/* path follower */
+					if(follower == null && (speed != 0f || turnRate != 0f)) {
+						speed = 0f;
+						turnRate = 0f;
+					} else if(follower == null) {
+						Point2D loc = new Point2D.Double(
+							local.average_x,local.average_y);
+						List<Point2D> pathlist = 
+							path.planPath(loc,
+								points.get(currentpoint));
+						follower = new Goto(pathlist);
+						jtk.setPath(pathlist);
 					}
-					
+					speed = (float)follower.speed;
+					turnRate = (float)follower.turnrate;
+					if(follower.done()) {
+						currentpoint++;
+					}
 				}
 
 				//speed /= 5.;
@@ -213,6 +235,12 @@ public class Retriever {
 				motor.setSpeed(speed, turnRate);
 				//update particles with given directions
 				local.update((double)motor.getX(),(double)motor.getY(),(double)motor.getYaw() * Math.PI/180.,sp);
+
+				if(follower != null) {
+					follower.update(	(double)motor.getX(),
+								(double)motor.getY(),
+								(double)motor.getYaw() * Math.PI/180.);
+				}
 				System.out.println("X: " + motor.getX() + " Y: " + motor.getY() + " THETA: " + motor.getYaw());
 			}
 		}					

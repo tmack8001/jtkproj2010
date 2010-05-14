@@ -22,6 +22,7 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 	private Image img = null;
 	private List<ImageConsumer> iclist;
 	private List<Point2D> points = null;
+	private List<Point2D> path = null;
 	private Graph prm = null;
 	private JTKLocal.Sample[] particles = null;
 	private ColorModel cm;
@@ -68,6 +69,11 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 
 	public void setPoints(List<Point2D> points) {
 		this.points = points;
+		repaint();
+	}
+
+	public void setPath(List<Point2D> path) {
+		this.path = path;
 		repaint();
 	}
 	
@@ -128,6 +134,21 @@ public class JTKMapImage extends JPanel implements ImageProducer {
 			      (int)(scaleW*JTKMap.point2pixels(p2).getX())-2,
 			      (int)(scaleH*JTKMap.point2pixels(p2).getY())-2
 			      );
+			}
+		}
+		if(path != null) {
+			Point2D prev = null;
+			for(Point2D q : path) {
+				Point2D p = JTKMap.point2pixels(q);
+				if(prev != null) {
+					g.drawLine((int)(scaleW * p.getX()),(int)(scaleH * p.getY()),
+						(int)(scaleW * prev.getX()),(int)(scaleH * prev.getY()));
+				}
+				g.fillRect(
+						(int)(scaleW*p.getX())-2,
+						(int)(scaleH*p.getY())-2,
+						5,5);
+				prev = p;
 			}
 		}
 		
