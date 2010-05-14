@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import view.JTKView;
 
 import javaclient2.PlayerClient;
 import javaclient2.Position2DInterface;

@@ -1,4 +1,7 @@
-package view;
+/**
+ * filename: SonarView.java
+ */
+
 import javax.swing.JPanel;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
@@ -9,8 +12,10 @@ import java.awt.RenderingHints;
 
 
 public class SonarView extends JPanel {
+
+	private static final long	serialVersionUID	= 1L;
+	
 	private float sp[] = { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f };
-	private int width = 400;
 	int pioneer_x[] = { 23,15,-15,-23,-23,-15,15,23 };
 	int pioneer_y[] = { 05,15,15,05,-05,-15,-15,-05 };
 	// spose[0] [ 0.075 0.130 90 ]
@@ -90,13 +95,10 @@ public class SonarView extends JPanel {
 			g.drawChars(reading,0,
 				(reading.length > 5 ? 5 : reading.length),
 				endpt_x1,endpt_y1);
-
-			
 		}
 	}
 
 	public Dimension getPreferredSize() {
 		return new Dimension(200,400);
 	}
-
 }
