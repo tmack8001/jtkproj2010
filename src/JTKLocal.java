@@ -186,6 +186,10 @@ public class JTKLocal implements Runnable{
 			S[i] = T[index];
 		}
 
+		lastx = curx;
+		lasty = cury;
+		lasth = curh;
+
 	}
 
 	public int binarysearch(int start,int end,double array[],double target) {
@@ -234,8 +238,9 @@ public class JTKLocal implements Runnable{
 		public Sample motion(double dx,double dy,double dh) {
 			//double dist = speed * time;
 			//double theta = turnrate * time;
-			return new Sample(X + dx, 
-				Y + dy, H+dh);
+			double dist = Math.sqrt(dx*dx + dy*dy);
+			return new Sample(X + dist * Math.cos(H + dh/2.), 
+				Y + dist * Math.sin(H + dh/2.), H+dh);
 		}
 
 		public boolean obstacle() {
