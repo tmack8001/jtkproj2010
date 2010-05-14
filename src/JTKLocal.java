@@ -48,6 +48,14 @@ public class JTKLocal implements Runnable{
 	private double cury;
 	private double curh;
 
+	private double average_x;
+	private double average_y;
+	private double average_h;
+
+	private double threshold = 3.;
+
+	private boolean localized = false;
+
 	// sonar info yanked from pioneer.inc
 	private double sonar_x[] =
 		{0.075,0.115,0.150,0.170,0.170,0.150,0.115,0.075};
@@ -174,8 +182,6 @@ public class JTKLocal implements Runnable{
 			// random U(0,1)
 			double p = rand.nextDouble();
 
-			// binary search through CDF
-			//int index = binarysearch(0,N,CDF,p);
 			// linear
 			int index=0;
 			while(index < N && p > CDF[index])
@@ -190,22 +196,37 @@ public class JTKLocal implements Runnable{
 		lasty = cury;
 		lasth = curh;
 
-	}
+		average_x = 0.;
+		average_y = 0.;
+		average_h = 0.;
 
-	public int binarysearch(int start,int end,double array[],double target) {
-		int index = start + (end-start)/2; 
-		if(start >= N || end >= N) 
-			return N-1;
-		else if(end <= start)
-			return start;
-		else if(index < 0) 
-			return 0;
-		else if(array[index] > target)
-			return binarysearch(start, index-1, array, target);
-		else if(array[index] < target)
-			return binarysearch(index+1, end, array, target);
-		else
-			return index; 
+		for(int i=0;i<N;i++) {
+			average_x += S[i].X;
+			average_y += S[i].Y;
+			average_h += S[i].H;
+		}
+
+		average_x /= (double)N;
+		average_y /= (double)N;
+		average_h /= (double)N;
+
+		int outliers = 0;
+		for(int i=0;i<N;i++) {
+			if((average_x - S[i].X)+(average_y - S[i].Y) > threshold) 
+				outliers++;
+		}
+
+		if(outliers < N/20)
+			localized = true;
+
+		if(localized) {
+			if(map.workspace(average_x,average_y)) {
+				for(int i=0;i<N;i++)
+					S[i] = new Sample(); //random
+				localized = false;
+			}
+		}
+
 	}
 			
 	public class Sample {
@@ -225,9 +246,9 @@ public class JTKLocal implements Runnable{
 		}
 
 		public Sample(double X,double Y,double H) {
-			this.X = X + rand.nextGaussian() * .05;
-			this.Y = Y + rand.nextGaussian() * .05;
-			this.H = H + rand.nextGaussian() * .01;
+			this.X = X + rand.nextGaussian() * .1;
+			this.Y = Y + rand.nextGaussian() * .1;
+			this.H = H + rand.nextGaussian() * .02;
 		}
 		
 		// H is in DEGREES if passed as INTEGER.
