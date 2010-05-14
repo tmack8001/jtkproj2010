@@ -1,6 +1,7 @@
-package view;
+/**
+ * filename: Mapper.java
+ */
 
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.*;

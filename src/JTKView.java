@@ -3,11 +3,6 @@
  * Trevor Mack -- May 7th
  */
 
-package view;
-
-import homework5.GridMap;
-import homework5.Mapper;
-
 import java.awt.*;
 import java.awt.event.*;
 
@@ -15,6 +10,7 @@ import javaclient2.Position2DInterface;
 import javaclient2.SonarInterface;
 
 import javax.swing.*;
+
 
 @SuppressWarnings("serial")
 public
@@ -25,6 +21,8 @@ class JTKView extends JFrame {
     
     private JFrame sonarFrame;
     private SonarView sonarView; //this shows the current sonar reading (from James)
+    private JTKMapImage particleImage; //this shows the current state of the particles for localization
+    
     
     private JButton sonarButton;
     private JButton exitButton;
