@@ -16,8 +16,9 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.*;
 
-public class JTKLocal {
+public class JTKLocal implements Runnable{
 
 	JTKMap map;
 	SonarModel sonar;
@@ -38,6 +39,8 @@ public class JTKLocal {
 		{1.571,0.873,0.523,0.175,-.175,-.523,-.873,-1.571};
 
 	public JTKLocal(SonarModel sonar,int N,JTKMap map) {
+		
+		
 		this.map = map;
 		this.sonar = sonar;
 		this.N = N;
@@ -284,6 +287,12 @@ public class JTKLocal {
 				local.update((double)speed,(double)turnRate,sp);
 			}
 		}
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
