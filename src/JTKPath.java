@@ -94,14 +94,13 @@ public class JTKPath extends Thread {
 			for( int j=0; j<closest.size(); j++ ) {
 				//try to connect points[i] to closest[j]
 				if( planPath(points.get(i), closest.get(j)) ) {
-					System.out.println("connected " + points.get(i) + " to " + closest.get(j));
+					//System.out.println("connected " + points.get(i) + " to " + closest.get(j));
 					prob_roadmap.addEdge(points.get(i), closest.get(j));
 					mapImage.setPRM(prob_roadmap);
-				}else {
-					System.out.println("could not plan a path between " + points.get(i) + " and " + closest.get(j));
 				}
 			}
 		}
+		System.out.println("total points: " + prob_roadmap.size());
 		
 		Random rand = new Random();
 		double X = 0, Y = 0;
