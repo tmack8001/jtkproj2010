@@ -52,7 +52,7 @@ public class JTKLocal implements Runnable{
 	public double average_y;
 	public double average_h;
 
-	private double threshold = 3.;
+	private double threshold = .5;
 
 	public boolean localized = false;
 
@@ -246,9 +246,9 @@ public class JTKLocal implements Runnable{
 		}
 
 		public Sample(double X,double Y,double H) {
-			this.X = X + rand.nextGaussian() * .1;
-			this.Y = Y + rand.nextGaussian() * .1;
-			this.H = H + rand.nextGaussian() * .02;
+			this.X = X + rand.nextGaussian() * .05;
+			this.Y = Y + rand.nextGaussian() * .05;
+			this.H = H + rand.nextGaussian() * .01;
 		}
 		
 		// H is in DEGREES if passed as INTEGER.
