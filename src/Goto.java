@@ -12,6 +12,8 @@ public class Goto {
 	public double speed = 0;
 	public double turnrate = 0;
 
+	public final double THRESHOLD = .5;
+
 	public Goto(List<Point2D> points) {
 		this.points = points;
 	}
@@ -20,7 +22,7 @@ public class Goto {
 		return i == points.size();
 	}
 
-	public void update(double xpos, double ypos, double currentangle) {
+	public void update(double xpos, double ypos, double currentangle,double sp[]) {
 		if(dist < .01) {
 			i++;
 		}
@@ -30,6 +32,8 @@ public class Goto {
 
 		double xdiff = xpos - points.get(i).getX();
 		double ydiff = ypos - points.get(i).getY();
+
+		if(currentangle > Math.PI) currentangle += -Math.PI;
 
 		double angle = Math.atan2(ydiff,xdiff);
 		//double angle = atan2(points[i].y,points[i].x);
@@ -60,6 +64,18 @@ public class Goto {
 				speed = (dist - .5)*.45 + .05;
 		}
 
+		//if(sp[3] < THRESHOLD || sp[4] < THRESHOLD) {
+		//	double left = sp[0] + sp[1] + sp[2] + sp[3];
+		//	double right = sp[4] + sp[5] + sp[6] + sp[7];
+		//	if(sp[3] + sp[4] > 2f) {
+		//		turnrate = (float)(Math.sqrt(left) 
+		//				- Math.sqrt(right));
+		//		speed = .5f;
+		//	} else {
+		//		speed = 0f;
+		//		turnrate = (float)Math.PI/12f;
+		//	}
+		//}
 	}
 
 }

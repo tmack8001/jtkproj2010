@@ -239,7 +239,8 @@ public class Retriever {
 				if(follower != null) {
 					follower.update(	(double)motor.getX(),
 								(double)motor.getY(),
-								(double)motor.getYaw() * Math.PI/180.);
+								(double)motor.getYaw() * Math.PI/180.,
+								sp);
 				}
 				System.out.println("X: " + motor.getX() + " Y: " + motor.getY() + " THETA: " + motor.getYaw());
 			}

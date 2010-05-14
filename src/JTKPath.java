@@ -167,7 +167,9 @@ public class JTKPath extends Thread {
     }
 	
 	public List<Point2D> planPath(Point2D robotLoc, Point2D goalLoc) {
-		return null;
+		List<Point2D> list = new LinkedList<Point2D>();
+		list.add(new Point2D.Double(40.,12.5));
+		return list;
 	}
 	
 	public static void main(String[] args) {
