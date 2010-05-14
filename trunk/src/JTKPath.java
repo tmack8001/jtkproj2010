@@ -93,7 +93,7 @@ public class JTKPath extends Thread {
 			List<Point2D> closest = prob_roadmap.closestVertices(points.get(i), 10);
 			for( int j=0; j<closest.size(); j++ ) {
 				//try to connect points[i] to closest[j]
-				if( planPath(points.get(i), closest.get(j)) ) {
+				if( isSimplePath(points.get(i), closest.get(j)) ) {
 					//System.out.println("connected " + points.get(i) + " to " + closest.get(j));
 					prob_roadmap.addEdge(points.get(i), closest.get(j));
 					mapImage.setPRM(prob_roadmap);
@@ -131,7 +131,7 @@ public class JTKPath extends Thread {
 		List<Point2D> closest = prob_roadmap.closestVertices(curPoint, 5);
 		for( int j=0; j<closest.size(); j++ ) {
 			//try to connect points[i] to closest[j]
-			if( planPath(curPoint, closest.get(j)) ) {
+			if( isSimplePath(curPoint, closest.get(j)) ) {
 				System.out.println("connected " + curPoint + " to " + closest.get(j));
 				prob_roadmap.addEdge(curPoint, closest.get(j));
 				mapImage.setPRM(prob_roadmap);
@@ -151,20 +151,24 @@ public class JTKPath extends Thread {
 	 * @return		true, there is a "simple" path (will generate one if not one)
 	 * 				false, there is no path from p1 -> p2 
 	 */
-	public boolean planPath(Point2D p1, Point2D p2) {
+	public boolean isSimplePath(Point2D p1, Point2D p2) {
 		Point2D midpoint = JTKPath.midPoint(p1, p2);
 		if(midpoint.distance(p1) < 0.01) {
 			return true;
 		}else if( map.cspace(midpoint.getX(), midpoint.getY())) {
 			return false;
 		}
-		return planPath(p1, midpoint) && planPath(p2, midpoint);
+		return isSimplePath(p1, midpoint) && isSimplePath(p2, midpoint);
 	}
 	
 	public static Point2D midPoint(Point2D a, Point2D b) {
         return new Point2D.Double((a.getX() + b.getX()) / 2.0, (a.getY() + b
                 .getY()) / 2.0);
     }
+	
+	public List<Point2D> planPath(Point2D robotLoc, Point2D goalLoc) {
+		return null;
+	}
 	
 	public static void main(String[] args) {
 		JFrame f = new JFrame("JTKProj2010 - MRP Path Planning");
