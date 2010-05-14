@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -166,12 +168,97 @@ public class JTKPath extends Thread {
                 .getY()) / 2.0);
     }
 	
-	public List<Point2D> planPath(Point2D robotLoc, Point2D goalLoc) {
-		List<Point2D> list = new LinkedList<Point2D>();
-		list.add(new Point2D.Double(40.,12.5));
-		return list;
+	public class PointPath implements Comparable<PointPath> {
+		PointPath parentPoint;
+		Point2D pointLocation;
+		double hCost; //heuristic cost to goal
+		double gCost; //previous cost to this point
+		
+		PointPath(PointPath pp, Point2D p1, Point2D goal) {
+			parentPoint = pp;
+			pointLocation = p1;
+			hCost = p1.distance(goal);
+			gCost = pp.fCost();
+		}
+		
+		public double fCost() {
+			return gCost + hCost;
+		}
+
+		public int compareTo(PointPath o) {
+			if( this.fCost() < o.fCost() ) {
+				return -1;
+			}else if (this.fCost() == o.fCost()) {
+				return 0;
+			}
+			return 1;
+		}
+		
+		public boolean equals(PointPath o) {
+			if( this.pointLocation == o.pointLocation )
+				return true;
+			return false;
+		}
 	}
 	
+	/**
+	 * Function will return the A* path from the PRM graph.
+	 * 
+	 * @param robotLoc	the current start location
+	 * @param goalLoc	the goal location we are looking for
+	 * @return
+	 */
+	public List<Point2D> planPath(Point2D robotLoc, Point2D goalLoc) {
+		List<PointPath> closedList = new ArrayList<PointPath>();
+		List<PointPath> openList = new ArrayList<PointPath>();
+		
+		//make sure the robot's location and goal are in the prm
+		addPoint(robotLoc);
+		addPoint(goalLoc);
+		
+		PointPath goalPath = new PointPath(null, goalLoc, goalLoc);
+		
+		//add robot to openList
+		openList.add(new PointPath(null, robotLoc, goalLoc));
+		
+		while(!openList.isEmpty()) {
+			//sort the list by F costs
+			Collections.sort(openList);
+			PointPath curPoint = openList.remove(0);
+			closedList.add(curPoint);
+			for( Point2D neighbor : prob_roadmap.getNeighbors(curPoint.pointLocation) ) {
+				// if it is on the closed list, ignore it ... otherwise
+				if(!closedList.contains(neighbor)) {
+					PointPath pp = new PointPath(curPoint, neighbor, goalLoc);
+					//if it is on the open list, check if path to this point is better using G cost
+					if(openList.contains(pp)) {
+						PointPath prevPath = openList.get(openList.indexOf(pp)); 
+						//check to see if the new path is better than old path
+						if( pp.gCost < prevPath.gCost ) {
+							prevPath.parentPoint = pp;
+						}
+					//if it isn't on the open list, add it and make the curPoint the parent of this point (record F, G, and H)
+					}else {
+						openList.add(pp);
+					}
+				}
+				if(closedList.contains(goalPath))
+					return backtrace(closedList.get(closedList.indexOf(goalPath)));
+			}
+		}
+		return null;
+	}
+	
+	private List<Point2D> backtrace(PointPath goalPath) {
+		PointPath curPath = goalPath;
+		List<Point2D> path = new ArrayList<Point2D>();
+		while(curPath.parentPoint != null) {
+			path.add(0, curPath.pointLocation);
+			curPath = curPath.parentPoint;
+		}
+		return path;
+	}
+
 	public static void main(String[] args) {
 		JFrame f = new JFrame("JTKProj2010 - MRP Path Planning");
 
