@@ -142,7 +142,7 @@ public class Retriever {
 		jtk.setPoints(points);
 		
 		SonarModel sonarModel = new SonarModel(10);
-		JTKLocal local = new JTKLocal(sonarModel, 10000, map);
+		JTKLocal local = new JTKLocal(sonarModel, 5000, map);
 		new Thread(local).start();
 		
 		//add particles to the map

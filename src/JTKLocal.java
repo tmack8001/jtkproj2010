@@ -3,6 +3,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
+
 // --- added for testing ---
 import javaclient2.PlayerClient;
 import javaclient2.Position2DInterface;
@@ -34,8 +37,12 @@ public class JTKLocal implements Runnable{
 	private double turnrate;
 	private double[] sp;
 
-	private Object lock;
+	private Lock lock;
 	private boolean isready = false;
+
+	private double lastx;
+	private double lasty;
+	private double lasth;
 
 	// sonar info yanked from pioneer.inc
 	private double sonar_x[] =
@@ -54,20 +61,51 @@ public class JTKLocal implements Runnable{
 		rand = new Random();
 		S = new Sample[N];
 
-		for(int i=0;i<N;i++)
-			S[i] = new Sample(); //random
+		//for(int i=0;i<N;i++)
+		//	S[i] = new Sample(); //random
+		for(int i=0;i<N;i++) {
+			switch(i%8) {
+			case 0:
+				S[i] = new Sample(-15.5,12.,0);
+				break;
+			case 1:
+				S[i] = new Sample(-16.5,12.,180);
+				break;
+			case 2:
+				S[i] = new Sample(-5.,-10.5,0);
+				break;
+			case 3:
+				S[i] = new Sample(7.5,1.,90);
+				break;
+			case 4:
+				S[i] = new Sample(-48.,12.,90);
+				break;
+			case 5:
+				S[i] = new Sample(-48.,-10.5,270);
+				break;
+			case 6:
+				S[i] = new Sample(7.5,-5.,90);
+				break;
+			case 7:
+				S[i] = new Sample(0.,-7.,270);
+				break;
+			}
+		}
 
 		lasttime = System.currentTimeMillis();
-		lock = new Object();
+		lock = new ReentrantLock();
 		
 	}
 
 	public synchronized void update(double speed,double turnrate,double sp[]) {
-		this.speed = speed;
-		this.turnrate = turnrate;
-		this.sp = sp;
-		isready = true;
-		notify();	
+		if(!isready && lock.tryLock()) {
+			this.speed = speed;
+			this.turnrate = turnrate;
+			this.sp = sp;
+			isready = true;
+			System.out.println("updated");
+			lock.unlock();
+		}
 	}
 
 	// function implemented out of:
@@ -89,6 +127,12 @@ public class JTKLocal implements Runnable{
 		for(int i=0;i<N;i++) {
 			T[i] = S[i].motion(speed,turnrate);
 			W[i] = T[i].probability(sp);
+			//if(T[i].obstacle()) {
+			////if(W[i] < .01) {
+			//	T[i] = new Sample(); 
+			//	W[i] = T[i].probability(sp);
+			////}
+			//}
 			totalW += W[i];
 			if(W[i] > conf) conf = W[i];
 		}
@@ -162,14 +206,21 @@ public class JTKLocal implements Runnable{
 			this.Y = Y + rand.nextGaussian() * .05;
 			this.H = H + rand.nextGaussian() * .01;
 		}
+		
+		// H is in DEGREES if passed as INTEGER.
+		public Sample(double X,double Y,int H) {
+			this(X,Y,(double)H * Math.PI / 180.);
+		}
 
 		public Sample motion(double speed,double turnrate) {
 			double dist = speed * time;
 			double theta = turnrate * time;
-			// TODO: apply gaussian dist.
-			// TODO: account for moving and turning together
 			return new Sample(X + dist*Math.cos(H+theta), 
 				Y + dist*Math.sin(H+theta), H+theta);
+		}
+
+		public boolean obstacle() {
+			return map.workspace(X,Y);
 		}
 
 		// sonar reading probability
@@ -286,6 +337,7 @@ public class JTKLocal implements Runnable{
                 
 				double left = sp[0] + sp[1] + sp[2] + sp[3];
 				double right = sp[4] + sp[5] + sp[6] + sp[7];
+
 				if(sp[3] + sp[4] > 2f) {
 					turnRate = (float)(Math.sqrt(left) - Math.sqrt(right));
 					speed = .5f;
@@ -304,12 +356,13 @@ public class JTKLocal implements Runnable{
 	@Override
 	public void run() {
 		while(true) {
-			if(isready)
+			lock.lock();
+			if(isready) {
+				System.out.println("ready!");
 				_update();
-			isready = false;
-			try {
-				wait();
-			} catch(InterruptedException e) {}
+				isready = false;
+			}
+			lock.unlock();
 		}
 	}
 
