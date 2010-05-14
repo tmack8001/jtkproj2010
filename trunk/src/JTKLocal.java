@@ -48,13 +48,13 @@ public class JTKLocal implements Runnable{
 	private double cury;
 	private double curh;
 
-	private double average_x;
-	private double average_y;
-	private double average_h;
+	public double average_x;
+	public double average_y;
+	public double average_h;
 
 	private double threshold = 3.;
 
-	private boolean localized = false;
+	public boolean localized = false;
 
 	// sonar info yanked from pioneer.inc
 	private double sonar_x[] =
