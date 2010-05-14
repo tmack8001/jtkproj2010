@@ -34,6 +34,7 @@ public class JTKLocal implements Runnable{
 	private double turnrate;
 	private double[] sp;
 
+	private Object lock;
 	private boolean isready = false;
 
 	// sonar info yanked from pioneer.inc
@@ -57,10 +58,11 @@ public class JTKLocal implements Runnable{
 			S[i] = new Sample(); //random
 
 		lasttime = System.currentTimeMillis();
+		lock = new Object();
 		
 	}
 
-	public void update(double speed,double turnrate,double sp[]) {
+	public synchronized void update(double speed,double turnrate,double sp[]) {
 		this.speed = speed;
 		this.turnrate = turnrate;
 		this.sp = sp;
@@ -71,7 +73,7 @@ public class JTKLocal implements Runnable{
 	// function implemented out of:
 	// Artificial Intelligence, 3rd Ed, 
 	// by Russel & Norvig, page 982.
-	public void _update() {
+	public synchronized void _update() {
 
 		Sample T[] = new Sample[N];
 		double W[] = new double[N];
@@ -305,7 +307,9 @@ public class JTKLocal implements Runnable{
 			if(isready)
 				_update();
 			isready = false;
-			wait();
+			try {
+				wait();
+			} catch(InterruptedException e) {}
 		}
 	}
 
