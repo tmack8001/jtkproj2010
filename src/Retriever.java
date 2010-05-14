@@ -49,6 +49,8 @@ public class Retriever {
     
     private static JButton sonarButton;
     private static JButton exitButton;
+
+	private static Goto follower = null;
 	
 	/**
 	 * @param 	args[0] host
@@ -185,19 +187,27 @@ public class Retriever {
 				for(int i=0;i<8;i++) 
 					sp[i] = ranges[i];
                 
-				//execute a random walk
-				double left = sp[0] + sp[1] + sp[2] + sp[3];
-				double right = sp[4] + sp[5] + sp[6] + sp[7];
-				if(sp[3] + sp[4] > 2f) {
-					turnRate = (float)(Math.sqrt(left) - Math.sqrt(right));
-					speed = .5f;
+				//execute a random walk if not localized
+				if(!local.localized) {
+					double left = sp[0] + sp[1] + sp[2] + sp[3];
+					double right = sp[4] + sp[5] + sp[6] + sp[7];
+					if(sp[3] + sp[4] > 2f) {
+						turnRate = (float)(Math.sqrt(left) 
+								- Math.sqrt(right));
+						speed = .5f;
+					} else {
+						speed = 0f;
+						turnRate = (float)Math.PI/12f;
+					}
 				} else {
-					speed = 0f;
-					turnRate = (float)Math.PI/12f;
+					if(follower == null) {
+						/* path follower */
+					}
+					
 				}
 
-				speed /= 5.;
-				turnRate /= 5.;
+				//speed /= 5.;
+				//turnRate /= 5.;
 				
 				// send the command
 				motor.setSpeed(speed, turnRate);
