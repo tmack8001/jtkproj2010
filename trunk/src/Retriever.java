@@ -195,6 +195,9 @@ public class Retriever {
 					speed = 0f;
 					turnRate = (float)Math.PI/12f;
 				}
+
+				speed /= 5.;
+				turnRate /= 5.;
 				
 				// send the command
 				motor.setSpeed(speed, turnRate);
