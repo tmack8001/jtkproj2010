@@ -110,13 +110,13 @@ public class JTKLocal implements Runnable{
 			//this.speed = speed;
 			//this.turnrate = turnrate;
 			
-			this.curx = curx;
-			this.cury = cury;
-			this.curh = curh;
+			this.curx = x;
+			this.cury = y;
+			this.curh = h;
 			if(firsttime) {
-				this.lastx = curx;
-				this.lasty = cury;
-				this.lasth = curh;
+				this.lastx = x;
+				this.lasty = y;
+				this.lasth = h;
 				firsttime = false;
 			}
 
