@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.Comparator;
 
 import javax.swing.JFrame;
 
@@ -75,7 +77,7 @@ public class JTKPath extends Thread {
 	        		//add point from file to roadmap
 	        		if(!map.cspace(curPoint.getX(), curPoint.getY())) {
 		        		prob_roadmap.addVertex(curPoint);
-		        		System.out.println("adding: " + curPoint.toString());
+		        		//System.out.println("adding: " + curPoint.toString());
 	        		}
 	        	}
 	        }
@@ -107,7 +109,7 @@ public class JTKPath extends Thread {
 		Random rand = new Random();
 		double X = 0, Y = 0;
 		boolean obstacle = true;
-		for(int i=0; i<1000; i++) {
+		for(int i=0; i<5000; i++) {
 			while(obstacle) {
 				X = (rand.nextDouble() - .5) * 131.2;
 				Y = (rand.nextDouble() - .5) * 41;
@@ -127,18 +129,18 @@ public class JTKPath extends Thread {
 	public void addPoint(Point2D curPoint) {
 		if(!map.cspace(curPoint.getX(), curPoint.getY())) {
     		prob_roadmap.addVertex(curPoint);
-    		System.out.println("adding: " + curPoint.toString());
+    		//System.out.println("adding: " + curPoint.toString());
 		}
 		
 		List<Point2D> closest = prob_roadmap.closestVertices(curPoint, 5);
 		for( int j=0; j<closest.size(); j++ ) {
 			//try to connect points[i] to closest[j]
 			if( isSimplePath(curPoint, closest.get(j)) ) {
-				System.out.println("connected " + curPoint + " to " + closest.get(j));
+				//System.out.println("connected " + curPoint + " to " + closest.get(j));
 				prob_roadmap.addEdge(curPoint, closest.get(j));
 				mapImage.setPRM(prob_roadmap);
 			}else {
-				System.out.println("could not plan a path between " + curPoint + " and " + closest.get(j));
+				//System.out.println("could not plan a path between " + curPoint + " and " + closest.get(j));
 			}
 		}
 	}
@@ -212,45 +214,88 @@ public class JTKPath extends Thread {
 	 * @return
 	 */
 	public List<Point2D> planPath(Point2D robotLoc, Point2D goalLoc) {
-		List<PointPath> closedList = new ArrayList<PointPath>();
-		List<PointPath> openList = new ArrayList<PointPath>();
-		
-		//make sure the robot's location and goal are in the prm
 		addPoint(robotLoc);
 		addPoint(goalLoc);
-		
-		PointPath goalPath = new PointPath(null, goalLoc, goalLoc);
-		
-		//add robot to openList
-		openList.add(new PointPath(null, robotLoc, goalLoc));
-		
-		while(!openList.isEmpty()) {
-			//sort the list by F costs
-			Collections.sort(openList);
-			PointPath curPoint = openList.remove(0);
-			closedList.add(curPoint);
-			for( Point2D neighbor : prob_roadmap.getNeighbors(curPoint.pointLocation) ) {
-				// if it is on the closed list, ignore it ... otherwise
-				if(!closedList.contains(neighbor)) {
-					PointPath pp = new PointPath(curPoint, neighbor, goalLoc);
-					//if it is on the open list, check if path to this point is better using G cost
-					if(openList.contains(pp)) {
-						PointPath prevPath = openList.get(openList.indexOf(pp)); 
-						//check to see if the new path is better than old path
-						if( pp.gCost < prevPath.gCost ) {
-							prevPath.parentPoint = pp;
-						}
-					//if it isn't on the open list, add it and make the curPoint the parent of this point (record F, G, and H)
-					}else {
-						openList.add(pp);
+
+		LinkedList<Point2D> q = new LinkedList<Point2D>();
+		HashMap<Point2D,Point2D> parent = new HashMap<Point2D,Point2D>();
+		q.add(robotLoc);
+
+		final Point2D goal = goalLoc;
+	
+		boolean found = false;
+		while(!found) {
+			if(q.isEmpty()) {
+				break;
+			}
+			Collections.sort(q,new Comparator<Point2D>() {
+				public int compare(Point2D a,Point2D b) {
+					return (int)((goal.distance(a) - goal.distance(b)) * 100);
+				}
+			});
+			Point2D current = q.removeFirst();
+			
+			if(current.equals(goalLoc)) {
+				found = true;
+			} else {
+				for( Point2D neighbor : prob_roadmap.getNeighbors(current) ) {
+					if(parent.get(neighbor) == null) {
+						q.addLast(neighbor);
+						parent.put(neighbor,current);
 					}
 				}
-				if(closedList.contains(goalPath))
-					return backtrace(closedList.get(closedList.indexOf(goalPath)));
 			}
 		}
-		return null;
+
+		LinkedList<Point2D> pathlist = new LinkedList<Point2D>();
+
+		Point2D current = goalLoc;
+		pathlist.addFirst(current);
+		while(!current.equals(robotLoc)) {
+			current = parent.get(current);
+			pathlist.addFirst(current);
+		}
+		return pathlist;
 	}
+	//	List<PointPath> closedList = new ArrayList<PointPath>();
+	//	List<PointPath> openList = new ArrayList<PointPath>();
+	//	
+	//	//make sure the robot's location and goal are in the prm
+	//	addPoint(robotLoc);
+	//	addPoint(goalLoc);
+	//	
+	//	PointPath goalPath = new PointPath(null, goalLoc, goalLoc);
+	//	
+	//	//add robot to openList
+	//	openList.add(new PointPath(null, robotLoc, goalLoc));
+	//	
+	//	while(!openList.isEmpty()) {
+	//		//sort the list by F costs
+	//		Collections.sort(openList);
+	//		PointPath curPoint = openList.remove(0);
+	//		closedList.add(curPoint);
+	//		for( Point2D neighbor : prob_roadmap.getNeighbors(curPoint.pointLocation) ) {
+	//			// if it is on the closed list, ignore it ... otherwise
+	//			if(!closedList.contains(neighbor)) {
+	//				PointPath pp = new PointPath(curPoint, neighbor, goalLoc);
+	//				//if it is on the open list, check if path to this point is better using G cost
+	//				if(openList.contains(pp)) {
+	//					PointPath prevPath = openList.get(openList.indexOf(pp)); 
+	//					//check to see if the new path is better than old path
+	//					if( pp.gCost < prevPath.gCost ) {
+	//						prevPath.parentPoint = pp;
+	//					}
+	//				//if it isn't on the open list, add it and make the curPoint the parent of this point (record F, G, and H)
+	//				} else {
+	//					openList.add(pp);
+	//				}
+	//			}
+	//			if(closedList.contains(goalPath))
+	//				return backtrace(closedList.get(closedList.indexOf(goalPath)));
+	//		}
+	//	}
+	//	return null;
+	//}
 	
 	private List<Point2D> backtrace(PointPath goalPath) {
 		PointPath curPath = goalPath;

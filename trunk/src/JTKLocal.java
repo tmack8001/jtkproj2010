@@ -130,7 +130,6 @@ public class JTKLocal implements Runnable{
 
 			this.sp = sp;
 			isready = true;
-			System.out.println("updated");
 			lock.unlock();
 		}
 	}
@@ -146,8 +145,6 @@ public class JTKLocal implements Runnable{
 		long now = System.currentTimeMillis();
 		time = (double)(now - lasttime) / 1000.; 
 		lasttime = now;
-
-		System.out.println(time + " " + new java.util.Date());
 
 		double totalW = 0.;
 		double conf = 0.;
@@ -170,9 +167,6 @@ public class JTKLocal implements Runnable{
 			CDF[i] = W[i] / totalW + pastCDF;
 		}
 
-		System.out.println("time: " + time + " conf: " + conf
-			+ " totalW = " + totalW);
-		
 		// sampling
 		for(int i=0;i<N;i++) {
 			//if(i < 100 && totalW < 20.) {
@@ -219,13 +213,13 @@ public class JTKLocal implements Runnable{
 		if(outliers < N/20)
 			localized = true;
 
-		if(localized) {
-			if(map.workspace(average_x,average_y)) {
-				for(int i=0;i<N;i++)
-					S[i] = new Sample(); //random
-				localized = false;
-			}
-		}
+		//if(localized) {
+		//	if(map.workspace(average_x,average_y)) {
+		//		for(int i=0;i<N;i++)
+		//			S[i] = new Sample(); //random
+		//		localized = false;
+		//	}
+		//}
 
 	}
 			
@@ -335,7 +329,6 @@ public class JTKLocal implements Runnable{
 		while(true) {
 			lock.lock();
 			if(isready) {
-				System.out.println("ready!");
 				_update();
 				isready = false;
 			}

@@ -23,59 +23,45 @@ public class Goto {
 	}
 
 	public void update(double xpos, double ypos, double currentangle,double sp[]) {
-		if(dist < .01) {
+		if(dist < .2) {
+			System.out.println(">>>>>>>> REACHED POINT" + i + ": " + points.get(i));
+			System.out.println("=================================================");
 			i++;
 		}
+
 		if(i >= points.size()) {
-			
+			speed = 0.;
+			turnrate = 0.;
+			System.out.println("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			System.exit(0);
+			return;
 		}
 
 		double xdiff = xpos - points.get(i).getX();
 		double ydiff = ypos - points.get(i).getY();
 
-		if(currentangle > Math.PI) currentangle += -Math.PI;
+		dist = Math.sqrt(xdiff*xdiff + ydiff*ydiff);
 
-		double angle = Math.atan2(ydiff,xdiff);
-		//double angle = atan2(points[i].y,points[i].x);
+		double angle = Math.atan2(dist * Math.sin(currentangle),dist * Math.cos(currentangle));
 
-		dist = Math.sqrt( xdiff*xdiff + ydiff*ydiff );
+		double newturnrate = 0.;
+		double newspeed = 0.;
 
-		double adiff = angle - currentangle + 2*Math.PI;
-		adiff = adiff - (2*Math.PI)*Math.floor(adiff/(2*Math.PI)) - Math.PI;
-		if(adiff > Math.PI) {
-			adiff += -2*Math.PI;
-		} else if(adiff < -Math.PI) {
-			adiff += 2*Math.PI;
-		}
-
-		if(Math.abs(adiff) > .15) {
-			if(Math.abs(adiff) < 1.0) {
-				turnrate = 4*Math.abs(adiff)+.1;
-			} else {
-				speed = 0.0;
-				turnrate = 0.5;
-			}
-		} else {
-			if(dist < .5)
-				speed = .05;
-			else if(dist > 1)
-				speed = .5;
+		if(Math.abs(angle) > 10. * Math.PI/180.) {
+			if(angle < 0)
+				newturnrate = -20.0 * Math.PI / 180.0;
 			else
-				speed = (dist - .5)*.45 + .05;
+				newturnrate = 20.0 * Math.PI / 180.0;
 		}
 
-		//if(sp[3] < THRESHOLD || sp[4] < THRESHOLD) {
-		//	double left = sp[0] + sp[1] + sp[2] + sp[3];
-		//	double right = sp[4] + sp[5] + sp[6] + sp[7];
-		//	if(sp[3] + sp[4] > 2f) {
-		//		turnrate = (float)(Math.sqrt(left) 
-		//				- Math.sqrt(right));
-		//		speed = .5f;
-		//	} else {
-		//		speed = 0f;
-		//		turnrate = (float)Math.PI/12f;
-		//	}
-		//}
+		if(sp[3] < 0.5 || sp[4] < 0.5)
+			newspeed = 0.0;
+		else
+			newspeed = 0.5;
+
+		speed = newspeed;
+		turnrate = newturnrate;
+
 	}
 
 }

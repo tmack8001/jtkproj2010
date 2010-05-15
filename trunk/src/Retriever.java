@@ -209,40 +209,36 @@ public class Retriever {
 					speed = 0f;
 					turnRate = 1f; 
 				} else {
-					if(follower == null && (speed != 0f || turnRate != 0f)) {
-						speed = 0f;
-						turnRate = 0f;
-					} else if(follower == null) {
+					if(follower == null) {
+						motor.setSpeed(0f,0f);
+						System.out.println("PLANNING PATH...");
 						Point2D loc = new Point2D.Double(
 							local.average_x,local.average_y);
 						List<Point2D> pathlist = 
 							path.planPath(loc,
 								points.get(currentpoint));
+						System.out.println(pathlist);
 						follower = new Goto(pathlist);
 						jtk.setPath(pathlist);
-					}
-					speed = (float)follower.speed;
-					turnRate = (float)follower.turnrate;
-					if(follower.done()) {
-						currentpoint++;
+					} else {
+						speed = (float)follower.speed;
+						turnRate = (float)follower.turnrate;
+						if(follower.done()) {
+							currentpoint++;
+						}
 					}
 				}
 
-				//speed /= 5.;
-				//turnRate /= 5.;
-				
 				// send the command
 				motor.setSpeed(speed, turnRate);
+				//System.out.println("SPEED: " + speed + " TURNRATE: " + turnRate);
 				//update particles with given directions
 				local.update((double)motor.getX(),(double)motor.getY(),(double)motor.getYaw() * Math.PI/180.,sp);
 
 				if(follower != null) {
-					follower.update(	(double)motor.getX(),
-								(double)motor.getY(),
-								(double)motor.getYaw() * Math.PI/180.,
-								sp);
+					follower.update(local.average_x,local.average_y,local.average_h,sp);	
 				}
-				System.out.println("X: " + motor.getX() + " Y: " + motor.getY() + " THETA: " + motor.getYaw());
+				//System.out.println("X: " + motor.getX() + " Y: " + motor.getY() + " THETA: " + motor.getYaw());
 			}
 		}					
 	}
